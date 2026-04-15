@@ -12,12 +12,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import ScanFrame from '../components/ScanFrame';
 import { recognizePlant } from '../services/recognition';
-import { saveCard, uploadImage } from '../services/storage';
-import * as Location from 'expo-location';
+import { useLanguage } from '../services/language';
 import { Colors, Spacing, Radius, Typography } from '../constants/theme';
 
 export default function Camera() {
   const router = useRouter();
+  const { t } = useLanguage();
   const cameraRef = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [scanning, setScanning] = useState(false);
@@ -30,7 +30,7 @@ export default function Camera() {
       if (!photo) return;
       await processImage(photo.uri);
     } catch (e) {
-      Alert.alert('Помилка', 'Не вдалося зробити фото');
+      Alert.alert(t('error'), t('camera_error_photo'));
     } finally {
       setScanning(false);
     }
@@ -52,46 +52,27 @@ export default function Camera() {
 
   async function processImage(uri: string) {
     const recognition = await recognizePlant(uri);
-    if (!recognition.bestMatch) {
-      Alert.alert('Не розпізнано', 'Спробуй сфотографувати ближче або з іншого кута');
+    if (!recognition.results || recognition.results.length === 0) {
+      Alert.alert(t('camera_not_recognized'), t('camera_error_notfound'));
       return;
     }
 
-    // Геолокація
-    let location: { latitude: number; longitude: number; label?: string } | undefined;
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status === 'granted') {
-      const loc = await Location.getCurrentPositionAsync({});
-      const [geo] = await Location.reverseGeocodeAsync(loc.coords);
-      location = {
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
-        label: [geo?.city, geo?.country].filter(Boolean).join(', '),
-      };
-    }
-
-    const tempId = Date.now().toString();
-    const imageUrl = await uploadImage(uri, tempId);
-
-    const id = await saveCard({
-      scientificName: recognition.bestMatch.scientificName,
-      commonName: recognition.bestMatch.commonNames[0] ?? recognition.bestMatch.scientificName,
-      family: recognition.bestMatch.family,
-      score: recognition.bestMatch.score,
-      imageUrl,
-      location,
-      createdAt: new Date(),
+    // Переходимо на екран вибору результату (топ-5)
+    router.push({
+      pathname: '/results',
+      params: {
+        data: JSON.stringify(recognition.results.slice(0, 5)),
+        imageUri: uri,
+      },
     });
-
-    router.replace(`/card/${id}`);
   }
 
   if (!permission?.granted) {
     return (
       <View style={styles.center}>
-        <Text style={styles.permText}>Потрібен доступ до камери</Text>
+        <Text style={styles.permText}>{t('camera_perm_text')}</Text>
         <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
-          <Text style={styles.permBtnText}>Дозволити</Text>
+          <Text style={styles.permBtnText}>{t('camera_perm_btn')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -103,12 +84,12 @@ export default function Camera() {
 
       {/* Накладення */}
       <View style={styles.overlay}>
-        <Text style={styles.hint}>Наведи на рослину</Text>
+        <Text style={styles.hint}>{t('camera_hint')}</Text>
         <ScanFrame scanning={scanning} />
         {scanning && (
           <View style={styles.scanningInfo}>
             <ActivityIndicator color="#fff" />
-            <Text style={styles.scanningText}>Розпізнаю...</Text>
+            <Text style={styles.scanningText}>{t('camera_recognizing')}</Text>
           </View>
         )}
       </View>

@@ -1,19 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useLanguage } from '../services/language';
 import { Colors, Spacing, Typography } from '../constants/theme';
 
 export default function MapScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.backBtn} onPress={() => router.replace('/album')}>
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
       <View style={styles.center}>
         <Text style={styles.emoji}>🗺️</Text>
-        <Text style={styles.text}>Карта доступна лише в мобільному застосунку</Text>
+        <Text style={styles.text}>{t('map_mobile_only')}</Text>
       </View>
     </View>
   );

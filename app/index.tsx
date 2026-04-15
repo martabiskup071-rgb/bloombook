@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,33 @@ import {
   StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useLanguage } from '../services/language';
+import { LANGUAGES } from '../constants/i18n';
+import { getFamilyCode } from '../services/family';
+import LanguagePicker from '../components/LanguagePicker';
 import { Colors, Spacing, Radius, Typography } from '../constants/theme';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Onboarding() {
   const router = useRouter();
+  const { t, lang } = useLanguage();
+  const [showLangPicker, setShowLangPicker] = useState(false);
   const buttonScale = useRef(new Animated.Value(1)).current;
+
+  // Якщо вже є сімейний код — відразу на альбом
+  useEffect(() => {
+    getFamilyCode().then((code) => {
+      if (code) router.replace('/album');
+    });
+  }, []);
 
   const handlePressIn = () =>
     Animated.spring(buttonScale, { toValue: 0.96, useNativeDriver: true }).start();
   const handlePressOut = () =>
     Animated.spring(buttonScale, { toValue: 1, useNativeDriver: true }).start();
+
+  const currentLangFlag = LANGUAGES.find((l) => l.code === lang)?.flag ?? '🌐';
 
   return (
     <View style={styles.container}>
@@ -29,6 +44,12 @@ export default function Onboarding() {
       {/* Декоративне коло */}
       <View style={styles.bgCircle} />
 
+      {/* Кнопка мови — вгорі праворуч */}
+      <TouchableOpacity style={styles.langBtn} onPress={() => setShowLangPicker(true)}>
+        <Text style={styles.langFlag}>{currentLangFlag}</Text>
+        <Text style={styles.langCode}>{lang.toUpperCase()}</Text>
+      </TouchableOpacity>
+
       <View style={styles.content}>
         {/* Логотип */}
         <View style={styles.logoWrap}>
@@ -36,18 +57,16 @@ export default function Onboarding() {
           <Text style={styles.logoText}>Bloombook</Text>
         </View>
 
-        <Text style={styles.tagline}>
-          Відкривай світ рослин.{'\n'}Зберігай живі спогади.
-        </Text>
+        <Text style={styles.tagline}>{t('onboarding_tagline')}</Text>
 
         <View style={styles.features}>
           {[
-            { icon: '📷', text: 'Фотографуй рослини' },
-            { icon: '🔬', text: 'Розпізнавання за секунди' },
-            { icon: '🎙️', text: 'Голосові спогади' },
-            { icon: '🗺️', text: 'Карта знахідок' },
+            { icon: '📷', text: t('onboarding_feature_photo') },
+            { icon: '🔬', text: t('onboarding_feature_scan') },
+            { icon: '🎙️', text: t('onboarding_feature_voice') },
+            { icon: '🗺️', text: t('onboarding_feature_map') },
           ].map((f) => (
-            <View key={f.text} style={styles.featureRow}>
+            <View key={f.icon} style={styles.featureRow}>
               <Text style={styles.featureIcon}>{f.icon}</Text>
               <Text style={styles.featureText}>{f.text}</Text>
             </View>
@@ -63,10 +82,20 @@ export default function Onboarding() {
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           activeOpacity={1}
+          onPress={() => router.replace('/family-setup')}
         >
-          <Text style={styles.startBtnText}>Почати збирати 🌱</Text>
+          <Text style={styles.startBtnText}>{t('onboarding_start')}</Text>
         </TouchableOpacity>
       </Animated.View>
+      {/* Кнопка "вже є код" */}
+      <TouchableOpacity
+        style={styles.joinLink}
+        onPress={() => router.replace('/family-setup')}
+      >
+        <Text style={styles.joinLinkText}>🔗 {t('family_join')}</Text>
+      </TouchableOpacity>
+
+      <LanguagePicker visible={showLangPicker} onClose={() => setShowLangPicker(false)} />
     </View>
   );
 }
@@ -88,6 +117,27 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.4,
     backgroundColor: Colors.primary,
     opacity: 0.08,
+  },
+  langBtn: {
+    position: 'absolute',
+    top: Spacing.xl + 8,
+    right: Spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.sm + 2,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    zIndex: 10,
+  },
+  langFlag: { fontSize: 18 },
+  langCode: {
+    fontSize: Typography.fontSize.xs,
+    fontWeight: '700',
+    color: Colors.text,
   },
   content: { flex: 1, justifyContent: 'center', paddingTop: Spacing.xxl },
   logoWrap: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.lg },
@@ -119,5 +169,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: Typography.fontSize.lg,
     fontWeight: '700',
+  },
+  joinLink: {
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  joinLinkText: {
+    color: Colors.textSecondary,
+    fontSize: Typography.fontSize.sm,
   },
 });

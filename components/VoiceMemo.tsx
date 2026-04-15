@@ -7,6 +7,7 @@ import {
   Animated,
 } from 'react-native';
 import { Audio } from 'expo-av';
+import { useLanguage } from '../services/language';
 import { Colors, Spacing, Radius, Typography } from '../constants/theme';
 
 interface VoiceMemoProps {
@@ -15,6 +16,7 @@ interface VoiceMemoProps {
 }
 
 export default function VoiceMemo({ onRecorded, existingUri }: VoiceMemoProps) {
+  const { t } = useLanguage();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -105,11 +107,11 @@ export default function VoiceMemo({ onRecorded, existingUri }: VoiceMemoProps) {
 
         <View style={styles.info}>
           <Text style={styles.label}>
-            {isRecording ? `Запис... ${formatTime(duration)}` : audioUri ? 'Голосовий спогад' : 'Додати голос'}
+            {isRecording ? `${t('voice_recording')} ${formatTime(duration)}` : audioUri ? t('voice_memo') : t('voice_add')}
           </Text>
           {audioUri && !isRecording && (
             <TouchableOpacity onPress={playback}>
-              <Text style={styles.playBtn}>{isPlaying ? '⏹ Стоп' : '▶ Відтворити'}</Text>
+              <Text style={styles.playBtn}>{isPlaying ? t('voice_stop') : t('voice_play')}</Text>
             </TouchableOpacity>
           )}
         </View>

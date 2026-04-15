@@ -62,9 +62,14 @@ export default function LiveCard({ card, onPress }: LiveCardProps) {
           <Text style={styles.sciName} numberOfLines={1}>
             {card.scientificName}
           </Text>
-          {card.location?.label && (
+          {!!card.location?.label && (
             <Text style={styles.location} numberOfLines={1}>
               📍 {card.location.label}
+            </Text>
+          )}
+          {!!card.addedBy && (
+            <Text style={styles.addedBy} numberOfLines={1}>
+              👤 {card.addedBy}
             </Text>
           )}
         </View>
@@ -81,13 +86,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     overflow: 'hidden',
     borderWidth: 1.5,
-    // тінь
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
+    // тінь (elevation для Android, boxShadow для web/iOS)
     elevation: 5,
-  },
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.10)',
+  } as any,
   image: {
     width: '100%',
     height: '62%',
@@ -126,5 +128,11 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.xs,
     color: Colors.textSecondary,
     marginTop: 4,
+  },
+  addedBy: {
+    fontSize: Typography.fontSize.xs,
+    color: Colors.primary,
+    marginTop: 2,
+    fontWeight: '600',
   },
 });
