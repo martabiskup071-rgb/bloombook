@@ -64,6 +64,11 @@ export default function FamilySetupScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Кнопка назад */}
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.replace('/')}>
+          <Text style={styles.backBtnText}>← {t('back')}</Text>
+        </TouchableOpacity>
+
         {/* Логотип */}
         <View style={styles.logoRow}>
           <Text style={styles.logoEmoji}>🌿</Text>
@@ -324,4 +329,15 @@ const styles = StyleSheet.create({
   },
   backLink: { paddingVertical: Spacing.sm },
   backLinkText: { color: Colors.textSecondary, fontSize: Typography.fontSize.sm },
+  backBtn: {
+    alignSelf: 'flex-start',
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  backBtnText: {
+    color: Colors.textSecondary,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: '600',
+  },
 });

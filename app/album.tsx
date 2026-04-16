@@ -108,6 +108,9 @@ export default function Album() {
       <View style={styles.header}>
         <Text style={styles.title}>{t('album_title')}</Text>
         <View style={styles.headerActions}>
+          <TouchableOpacity onPress={() => router.push('/')} style={styles.iconBtn}>
+            <Text style={styles.iconBtnText}>🏠</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowLangPicker(true)} style={styles.iconBtn}>
             <Text style={styles.iconBtnText}>🌐</Text>
           </TouchableOpacity>
