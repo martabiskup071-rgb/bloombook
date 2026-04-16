@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "420756602873",
+    "project_id": "bloombook-cb2d0",
+    "storage_bucket": "bloombook-cb2d0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420756602873:android:bcc85f809e3b91c3258728",
+        "android_client_info": {
+          "package_name": "com.martabiskup.Bloombook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA2fimav4xExzkZqhtcpaVouCYop3nyz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
