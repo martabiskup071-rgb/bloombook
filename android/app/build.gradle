@@ -12,7 +12,6 @@ def projectRootFile = new File(projectRoot)
 react {
     entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, projectRootFile).text.trim())
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, projectRootFile).text.trim()).getParentFile().getAbsoluteFile()
-    // hermesCommand: hermes-compiler was removed in RN 0.79+, hermesc is now bundled inside react-native/sdks/
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, projectRootFile).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
     codegenDir = new File(["node", "--print", "require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, projectRootFile).text.trim()).getParentFile().getAbsoluteFile()
 
@@ -95,7 +94,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.1.0"
+        versionName "1.1.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
